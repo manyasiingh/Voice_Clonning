@@ -1,0 +1,14 @@
+# Tiny end-to-end check (minutes). Trains on dev-clean and evaluates on test-clean twice (dev == test),
+# so the numbers are meaningless - it only proves the pipeline runs. Never report these.
+train_subset: dev-clean
+dev_subset: test-clean
+test_subset: test-clean
+allow_overlap: true
+epochs: 1
+steps: 3
+P: 8
+K: 2
+warmup: 1
+eval_utts: 4
+n_boot: 50
+workers: 2

@@ -1,0 +1,18 @@
+# RQ1: SupCon fine-tuning of the pretrained VoxCeleb ECAPA-TDNN on LibriSpeech train-clean-100.
+# Model selection on dev-clean, final report on test-clean (speakers disjoint; asserted in code).
+# Run with --seed 0/1/2 and --out runs/rq1/finetune_s<seed> --results results/rq1/finetune_s<seed>.
+train_subset: train-clean-100
+dev_subset: dev-clean
+test_subset: test-clean
+scratch: false
+epochs: 10
+steps: 200
+P: 16
+K: 4
+crop: 3.0
+temp: 0.1
+warmup: 100
+eval_utts: 15
+eval_crop: 6.0
+eval_seed: 0
+n_boot: 1000

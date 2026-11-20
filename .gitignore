@@ -1,0 +1,18 @@
+__pycache__/
+*.pyc
+*.egg-info/
+.venv/
+.pytest_cache/
+# data, model downloads and checkpoints (large)
+data/
+runs/
+pretrained_models/
+pretrained_ecapa/
+tmp_*/
+*.pt
+*.tar.gz
+*.part
+# generated audio (keep results/ small: json/csv/png only)
+*.wav
+*.flac
+tts_out/

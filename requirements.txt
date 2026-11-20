@@ -1,0 +1,9 @@
+# Kaggle already provides torch/torchaudio/numpy/matplotlib with CUDA; we do NOT reinstall torch there.
+# These are lower bounds, not yet tested pins. After the first full Kaggle run, the exact versions used are
+# frozen into results/env/pip_freeze.txt and results/env/versions.json, and this file will be pinned to them.
+speechbrain>=1.0.3
+soundfile>=0.12
+pyyaml>=6.0
+pytest>=7.0
+# provided by Kaggle (listed for other machines):
+# torch>=2.4  torchaudio>=2.4  numpy  matplotlib
