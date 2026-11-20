@@ -113,9 +113,9 @@ def train(a):
         st = verification_stats(t["scores"], t["labels"])
         return {"eer": st["eer"], "thr": st["eer_threshold"], "min_dcf": st["min_dcf"]}
 
-    def save_best(m):
-        torch.save({"emb": enc.emb.state_dict(), "arch": enc.arch, **{k: float(v) for k, v in m.items()}},
-                   out / "best.pt")
+    def save_weights(m, epoch, name):
+        torch.save({"emb": enc.emb.state_dict(), "arch": enc.arch, "epoch": int(epoch),
+                    **{k: float(v) for k, v in m.items()}}, out / name)
 
     last = out / "last.pt"
     if last.exists():  # resume
@@ -125,14 +125,16 @@ def train(a):
         scaler.load_state_dict(ck["scaler"])
         _set_rng_state(ck["rng"])
         st = ck["state"]
+        st.setdefault("best_epoch", None)  # resume files written before this field existed
         print(f"resumed from {last} at epoch {st['epoch']} (step {st['step']})")
     else:
         m = dev_eval()
         print(f"[ep 0] dev EER {m['eer'] * 100:.2f}%  minDCF {m['min_dcf']:.3f}  thr {m['thr']:.3f}  (initial model)")
-        st = {"epoch": 0, "step": 0, "best_eer": math.inf, "history": [{"epoch": 0, **m}], "losses": []}
+        st = {"epoch": 0, "step": 0, "best_eer": math.inf, "best_epoch": None,
+              "history": [{"epoch": 0, **m}], "losses": []}
         if not a.scratch:  # the pretrained model is a valid candidate for "best"
-            st["best_eer"] = m["eer"]
-            save_best(m)
+            st["best_eer"], st["best_epoch"] = m["eer"], 0
+            save_weights(m, 0, "best.pt")
 
     ds = PKDataset(idx_tr, a.K, a.crop)
     sampler = DistinctSpeakerBatchSampler(len(ds), a.P, a.steps, seed=a.seed)
@@ -164,16 +166,23 @@ def train(a):
         print(f"[ep {ep}] loss {np.mean(ep_losses):.3f} | dev EER {m['eer'] * 100:.2f}%  "
               f"minDCF {m['min_dcf']:.3f}  thr {m['thr']:.3f}")
         if m["eer"] < st["best_eer"]:
-            st["best_eer"] = m["eer"]
-            save_best(m)
+            st["best_eer"], st["best_epoch"] = m["eer"], ep
+            save_weights(m, ep, "best.pt")
         st["epoch"] = ep
-        torch.save({"emb": enc.emb.state_dict(), "opt": opt.state_dict(), "scaler": scaler.state_dict(),
-                    "rng": _rng_state(), "state": st}, last)
-        save_json(res_dir / "train_history.json", {"history": st["history"], "losses": st["losses"]})
+        torch.save({"emb": enc.emb.state_dict(), "arch": enc.arch, "opt": opt.state_dict(),
+                    "scaler": scaler.state_dict(), "rng": _rng_state(), "state": st}, last)
+        save_json(res_dir / "train_history.json", {"history": st["history"], "losses": st["losses"],
+                                                    "best_epoch": st["best_epoch"]})
 
     plot_losses(st, res_dir / "loss_curve.png")
-    enc, _ = load_encoder(out / "best.pt", device)
-    evaluate_encoder(enc, idx_dv, idx_te, device, res_dir, a.eval_utts, a.eval_crop, a.eval_seed, a.n_boot)
+    sel = {"selected_epoch": st["best_epoch"], "selection": "lowest dev EER (epoch 0 = initial model)"}
+    # Main result: the dev-selected checkpoint. If no epoch beat the initial model, this IS the initial model.
+    enc_best, _ = load_encoder(out / "best.pt", device)
+    evaluate_encoder(enc_best, idx_dv, idx_te, device, res_dir, a.eval_utts, a.eval_crop, a.eval_seed, a.n_boot,
+                     extra={**sel, "evaluated_checkpoint": "best.pt"})
+    # Secondary: the weights after the last epoch, NOT selected on dev - shows what training itself did.
+    evaluate_encoder(enc.eval(), idx_dv, idx_te, device, res_dir / "final_epoch", a.eval_utts, a.eval_crop,
+                     a.eval_seed, a.n_boot, extra={**sel, "evaluated_checkpoint": f"final epoch {st['epoch']}"})
 
 
 def plot_losses(st, path):

@@ -5,6 +5,8 @@ SpkEncoder = Fbank(80) -> sentence mean normalisation -> ECAPA_TDNN. This reprod
 uses `Fbank(n_mels=80)` with default settings and `InputNormalization(norm_type=sentence, std_norm=False)`.
 tests/test_encoder_equivalence.py checks this numerically and reports the max abs difference.
 """
+from pathlib import Path
+
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -75,14 +77,30 @@ class SpkEncoder(nn.Module):
         return F.normalize(self(wav), dim=-1)
 
 
+def infer_arch(state_dict):
+    """'large' or 'small' from the width of the first TDNN block (1024 vs 512 channels)."""
+    width = state_dict["blocks.0.conv.conv.weight"].shape[0]
+    for name, cfg in ARCH.items():
+        if cfg["channels"][0] == width:
+            return name
+    raise ValueError(f"unknown ECAPA width {width}")
+
+
 def load_encoder(ckpt, device, savedir=PRETRAINED_SAVEDIR):
-    """ckpt = 'pretrained' or a path to a best.pt written by spkclone.train. Returns (encoder in eval mode, meta)."""
+    """ckpt = 'pretrained', a best.pt / final.pt written by spkclone.train, or a last.pt resume checkpoint
+    (= weights after the final epoch). Returns (encoder in eval mode, meta)."""
     if str(ckpt) == "pretrained":
-        enc, meta = SpkEncoder("large").load_pretrained(savedir), {"ckpt": "pretrained"}
+        return SpkEncoder("large").load_pretrained(savedir).to(device).eval(), {"ckpt": "pretrained"}
+    # best.pt / final.pt hold only tensors + plain scalars/strings, so the safe weights_only loader works.
+    # last.pt is our own resume file and also holds RNG states (NumPy arrays), which needs weights_only=False.
+    resume_file = Path(ckpt).name == "last.pt"
+    d = torch.load(ckpt, map_location="cpu", weights_only=not resume_file)
+    arch = d.get("arch") or infer_arch(d["emb"])
+    enc = SpkEncoder(arch)
+    enc.emb.load_state_dict(d["emb"])
+    if resume_file:
+        meta = {"epoch": d["state"]["epoch"], "step": d["state"]["step"]}
     else:
-        # best.pt holds only tensors + plain Python scalars/strings, so the safe weights_only loader works.
-        d = torch.load(ckpt, map_location="cpu", weights_only=True)
-        enc, meta = SpkEncoder(d["arch"]), {k: v for k, v in d.items() if k != "emb"}
-        enc.emb.load_state_dict(d["emb"])
-        meta["ckpt"] = str(ckpt)
+        meta = {k: v for k, v in d.items() if k != "emb"}
+    meta.update(ckpt=str(ckpt), arch=arch)
     return enc.to(device).eval(), meta

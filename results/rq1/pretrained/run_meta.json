@@ -1,0 +1,48 @@
+{
+  "time": "2026-11-20 12:35:23",
+  "argv": [
+    "/kaggle/working/repo/src/spkclone/verify.py",
+    "evaluate",
+    "--ckpt",
+    "pretrained",
+    "--root",
+    "/tmp/data",
+    "--out",
+    "results/rq1/pretrained"
+  ],
+  "config": {
+    "config": null,
+    "ckpt": "pretrained",
+    "out": "results/rq1/pretrained",
+    "root": "/tmp/data",
+    "dev_subset": "dev-clean",
+    "test_subset": "test-clean",
+    "dev_dir": null,
+    "test_dir": null,
+    "eval_utts": 15,
+    "eval_crop": 6.0,
+    "eval_seed": 0,
+    "n_boot": 1000,
+    "trials": null,
+    "wav_root": null,
+    "force": false
+  },
+  "versions": {
+    "python": "3.13.16",
+    "platform": "Linux-6.18.55+-x86_64-with-glibc2.39",
+    "torch": "2.11.0+cu130",
+    "cuda_available": true,
+    "cuda": "13.0",
+    "gpu": "Tesla T4",
+    "torchaudio": "2.11.0+cu130",
+    "speechbrain": "1.1.2",
+    "numpy": "2.1.3",
+    "soundfile": "0.14.0",
+    "matplotlib": "3.10.0",
+    "yaml": "6.0.3"
+  },
+  "git": {
+    "commit": "1f3bdbd321f19f47cd5004018e13ba872e013cb7",
+    "dirty": true
+  }
+}

@@ -1,0 +1,72 @@
+{
+  "eer": 0.048349002849002856,
+  "eer_threshold": 0.5448962450027466,
+  "min_dcf": 0.4799633699633699,
+  "p_target": 0.01,
+  "n_trials": 179700,
+  "n_target": 4200,
+  "n_nontarget": 175500,
+  "n_speakers": 40,
+  "ci_trials": {
+    "n_boot": 1000,
+    "n_failed": 0,
+    "level": 0.95,
+    "eer": {
+      "lo": 0.04506125282182232,
+      "hi": 0.052309595119284145,
+      "std": 0.0018375600910494692
+    },
+    "min_dcf": {
+      "lo": 0.4566709442995077,
+      "hi": 0.49617926525894596,
+      "std": 0.01040753501017259
+    }
+  },
+  "ci_speakers": {
+    "n_boot": 1000,
+    "n_failed": 0,
+    "level": 0.95,
+    "eer": {
+      "lo": 0.03165432717379158,
+      "hi": 0.07095767628063998,
+      "std": 0.010217196478607197
+    },
+    "min_dcf": {
+      "lo": 0.3479672603663256,
+      "hi": 0.5814183854125203,
+      "std": 0.058098096154568915
+    }
+  },
+  "calibration_dev": {
+    "eer_dev": 0.08071326821326823,
+    "thr_eer": 0.5228067636489868,
+    "far_target": 0.01,
+    "thr_far": 0.7125810384750366
+  },
+  "at_dev_eer_threshold": {
+    "threshold": 0.5228067636489868,
+    "far": 0.05906552706552706,
+    "frr": 0.0419047619047619,
+    "n_target": 4200,
+    "n_nontarget": 175500
+  },
+  "at_dev_far1_threshold": {
+    "threshold": 0.7125810384750366,
+    "far": 0.005396011396011396,
+    "frr": 0.2057142857142857,
+    "n_target": 4200,
+    "n_nontarget": 175500
+  },
+  "cross_session_only": {
+    "eer": 0.062462000462000455,
+    "eer_threshold": 0.5162018537521362,
+    "min_dcf": 0.6675698775698776,
+    "n_target": 1665
+  },
+  "protocol": {
+    "eval_utts": 15,
+    "eval_crop": 6.0,
+    "eval_seed": 0,
+    "note": "all pairs of sampled utterances; many same-session pairs; not VoxCeleb-comparable"
+  }
+}

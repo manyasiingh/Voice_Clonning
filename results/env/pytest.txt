@@ -1,0 +1,51 @@
+...  /tmp/pytest-of-root/pytest-2/test_build_index_and_session0: 2 speakers, 6 files
+.WARNING: speaker overlap between splits: {'train&dev': 1} - results are NOT valid held-out numbers
+.  /tmp/pytest-of-root/pytest-2/test_load_crop_lengths0: 2 speakers, 6 files
+.  /tmp/pytest-of-root/pytest-2/test_pk_dataset_item_shape0: 2 speakers, 6 files
+...
+encoder equivalence: max abs diff = 0.000e+00 over 7 wavs (tolerance 0.0001)
+   {'wav': 'synthetic_1.5s', 'max_abs_diff': 0.0, 'cosine': 0.9999998807907104}
+   {'wav': 'synthetic_3.0s', 'max_abs_diff': 0.0, 'cosine': 1.0}
+   {'wav': 'synthetic_6.0s', 'max_abs_diff': 0.0, 'cosine': 0.9999999403953552}
+   {'wav': '1272-128104-0000.flac', 'max_abs_diff': 0.0, 'cosine': 0.9999998807907104}
+   {'wav': '1272-128104-0001.flac', 'max_abs_diff': 0.0, 'cosine': 0.9999999403953552}
+   {'wav': '1272-128104-0002.flac', 'max_abs_diff': 0.0, 'cosine': 0.9999998807907104}
+   {'wav': '1272-128104-0003.flac', 'max_abs_diff': 0.0, 'cosine': 1.0}
+...................
+  before: Dr. Smith paid $5 for 3 apples.
+  after:  doctor Smith paid five dollars for three apples.
+.
+  before: It costs $2.50.
+  after:  It costs two dollars fifty cents.
+.
+  before: It costs $1.
+  after:  It costs one dollar.
+.
+  before: Rates rose 12%.
+  after:  Rates rose twelve percent.
+.
+  before: Rates rose 12.5%.
+  after:  Rates rose twelve point five percent.
+.
+  before: the 21st century
+  after:  the twenty first century
+.
+  before: 1,250 people came.
+  after:  one thousand two hundred fifty people came.
+.
+  before: pi is 3.14
+  after:  pi is three point one four
+.
+  before: Tom & Jerry
+  after:  Tom and Jerry
+.
+  before: e.g. this one
+  after:  for example this one
+.
+  before: Room No. 5 is free.
+  after:  Room number five is free.
+.
+  before: Mr. and Mrs. Brown
+  after:  mister and missus Brown
+......................
+61 passed in 20.49s

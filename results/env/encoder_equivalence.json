@@ -1,0 +1,42 @@
+{
+  "max_abs_diff": 0.0,
+  "atol": 0.0001,
+  "passed": true,
+  "rows": [
+    {
+      "wav": "synthetic_1.5s",
+      "max_abs_diff": 0.0,
+      "cosine": 0.9999998807907104
+    },
+    {
+      "wav": "synthetic_3.0s",
+      "max_abs_diff": 0.0,
+      "cosine": 1.0
+    },
+    {
+      "wav": "synthetic_6.0s",
+      "max_abs_diff": 0.0,
+      "cosine": 0.9999999403953552
+    },
+    {
+      "wav": "1272-128104-0000.flac",
+      "max_abs_diff": 0.0,
+      "cosine": 0.9999998807907104
+    },
+    {
+      "wav": "1272-128104-0001.flac",
+      "max_abs_diff": 0.0,
+      "cosine": 0.9999999403953552
+    },
+    {
+      "wav": "1272-128104-0002.flac",
+      "max_abs_diff": 0.0,
+      "cosine": 0.9999998807907104
+    },
+    {
+      "wav": "1272-128104-0003.flac",
+      "max_abs_diff": 0.0,
+      "cosine": 1.0
+    }
+  ]
+}

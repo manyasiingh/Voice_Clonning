@@ -87,8 +87,10 @@ def pca_plot(emb, spk, path, max_spk=20):
     plt.close()
 
 
-def evaluate_encoder(enc, idx_dv, idx_te, device, out_dir, eval_utts=15, eval_crop=6.0, eval_seed=0, n_boot=1000):
-    """Calibrate on dev, report on test. Writes test_metrics.json, test_trials.npz, test_embeddings_pca.png."""
+def evaluate_encoder(enc, idx_dv, idx_te, device, out_dir, eval_utts=15, eval_crop=6.0, eval_seed=0, n_boot=1000,
+                     extra=None):
+    """Calibrate on dev, report on test. Writes test_metrics.json, test_trials.npz, test_embeddings_pca.png.
+    `extra` (dict) is stored in test_metrics.json too, e.g. which checkpoint / epoch was evaluated."""
     out_dir = Path(out_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
     e, s, f = embed_set(enc, idx_dv, eval_utts, eval_crop, device, eval_seed)
@@ -107,6 +109,7 @@ def evaluate_encoder(enc, idx_dv, idx_te, device, out_dir, eval_utts=15, eval_cr
         res["cross_session_only"] = None
     res["protocol"] = dict(eval_utts=eval_utts, eval_crop=eval_crop, eval_seed=eval_seed,
                            note="all pairs of sampled utterances; many same-session pairs; not VoxCeleb-comparable")
+    res.update(extra or {})
     save_json(out_dir / "test_metrics.json", res)
     np.savez_compressed(out_dir / "test_trials.npz", **t)
     pca_plot(e, s, out_dir / "test_embeddings_pca.png")
@@ -186,14 +189,15 @@ def evaluate_cli(argv=None):
         return
     write_run_meta(out, vars(a))
     device = get_device()
-    enc, _ = load_encoder(a.ckpt, device)
+    enc, meta = load_encoder(a.ckpt, device)
     if a.trials:
         st, scores, labels = evaluate_trial_list(enc, load_trial_list(a.trials), a.wav_root, device)
         save_json(out / "trial_list_metrics.json", {**st, "trials": a.trials, "n_trials": len(scores)})
         print("trial list:", st)
     idx_dv = build_index(resolve_split(a.dev_dir, a.dev_subset, a.root))
     idx_te = build_index(resolve_split(a.test_dir, a.test_subset, a.root))
-    evaluate_encoder(enc, idx_dv, idx_te, device, out, a.eval_utts, a.eval_crop, a.eval_seed, a.n_boot)
+    evaluate_encoder(enc, idx_dv, idx_te, device, out, a.eval_utts, a.eval_crop, a.eval_seed, a.n_boot,
+                     extra={"evaluated_checkpoint": {k: meta[k] for k in ("ckpt", "arch", "epoch") if k in meta}})
 
 
 if __name__ == "__main__":

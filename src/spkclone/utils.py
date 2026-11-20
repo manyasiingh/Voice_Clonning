@@ -64,7 +64,9 @@ def git_info():
         except Exception:
             return None
 
-    return {"commit": run("git", "rev-parse", "HEAD"), "dirty": bool(run("git", "status", "--porcelain"))}
+    # dirty = tracked files modified (new untracked outputs such as results/ do not count)
+    return {"commit": run("git", "rev-parse", "HEAD"),
+            "dirty": bool(run("git", "status", "--porcelain", "--untracked-files=no"))}
 
 
 def to_jsonable(x):
