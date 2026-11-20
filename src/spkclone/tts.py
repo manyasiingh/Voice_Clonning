@@ -20,6 +20,7 @@ import numpy as np
 import soundfile as sf
 import torch
 
+from .compat import apply_tts_patches
 from .data import load_wav
 from .textnorm import normalize
 from .utils import get_device, seed_everything
@@ -31,19 +32,8 @@ MODELS = {
 }
 
 
-def patch_mel_spectrogram_name():
-    """Compatibility alias. The hyperparams.yaml of speechbrain/tts-mstacotron2-libritts refers to
-    `speechbrain.lobes.models.Tacotron2.mel_spectogram` (typo). SpeechBrain renamed it to `mel_spectrogram`
-    (PR #3063; v1.1.x), with the same arguments, so loading fails with "There is no such entity". We add the old
-    name as an alias when only the new one exists. No-op on SpeechBrain 1.0.x, which still has the old name."""
-    import speechbrain.lobes.models.Tacotron2 as t2
-
-    if not hasattr(t2, "mel_spectogram") and hasattr(t2, "mel_spectrogram"):
-        t2.mel_spectogram = t2.mel_spectrogram
-
-
 def get_classes():
-    patch_mel_spectrogram_name()
+    apply_tts_patches()  # library-version compatibility, see compat.py
     try:
         from speechbrain.inference.TTS import MSTacotron2, Tacotron2
         from speechbrain.inference.vocoders import HIFIGAN

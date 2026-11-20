@@ -73,7 +73,7 @@ Runtime and GPU: TODO, recorded from the first Kaggle run (`results/env/versions
 ## Repo map
 
 ```
-src/spkclone/   encoder, data, losses, metrics, train, verify, explain, tts, textnorm, utils
+src/spkclone/   encoder, data, losses, metrics, train, verify, explain, tts, textnorm, compat, utils
 scripts/        original-CLI wrappers, aggregate_rq1.py
 configs/        YAML per experiment (smoke, rq1_finetune, rq1_scratch)
 tests/          pytest: metrics, loss, sampler/data, textnorm, encoder equivalence (slow)
