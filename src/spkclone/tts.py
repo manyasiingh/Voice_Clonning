@@ -31,7 +31,19 @@ MODELS = {
 }
 
 
+def patch_mel_spectrogram_name():
+    """Compatibility alias. The hyperparams.yaml of speechbrain/tts-mstacotron2-libritts refers to
+    `speechbrain.lobes.models.Tacotron2.mel_spectogram` (typo). SpeechBrain renamed it to `mel_spectrogram`
+    (PR #3063; v1.1.x), with the same arguments, so loading fails with "There is no such entity". We add the old
+    name as an alias when only the new one exists. No-op on SpeechBrain 1.0.x, which still has the old name."""
+    import speechbrain.lobes.models.Tacotron2 as t2
+
+    if not hasattr(t2, "mel_spectogram") and hasattr(t2, "mel_spectrogram"):
+        t2.mel_spectogram = t2.mel_spectrogram
+
+
 def get_classes():
+    patch_mel_spectrogram_name()
     try:
         from speechbrain.inference.TTS import MSTacotron2, Tacotron2
         from speechbrain.inference.vocoders import HIFIGAN
@@ -68,7 +80,8 @@ class TTSRunner:
 
     def __init__(self, mode, device, savedir="pretrained_models"):
         MSTacotron2, Tacotron2, HIFIGAN = get_classes()
-        self.mode, opts = mode, {"device": device}
+        # SpeechBrain expects "cuda:0" (a bare "cuda" only triggers a warning and falls back to device 0)
+        self.mode, opts = mode, {"device": "cuda:0" if device == "cuda" else device}
         tts_src, voc_src = MODELS["single" if mode == "single" else "multi"]
         cls = Tacotron2 if mode == "single" else MSTacotron2
         self.tts = cls.from_hparams(source=tts_src, savedir=f"{savedir}/{tts_src.split('/')[1]}", run_opts=opts)
